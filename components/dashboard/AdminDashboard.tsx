@@ -191,7 +191,7 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
               >
                 {courseDistribution.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -213,7 +213,10 @@ export function AdminDashboard({ stats }: AdminDashboardProps) {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis tickFormatter={(value) => `₹${value / 1000}K`} />
-              <Tooltip formatter={(value) => formatCurrency(value)} />
+              <Tooltip formatter={(value) => {
+                const numValue = Array.isArray(value) ? value[0] : value;
+                return formatCurrency(typeof numValue === 'string' ? parseFloat(numValue) : numValue);
+              }} />
               <Bar dataKey="collected" fill="#10B981" />
               <Bar dataKey="pending" fill="#EF4444" />
             </BarChart>

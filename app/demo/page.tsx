@@ -18,8 +18,32 @@ import {
   HostelType,
   RoomType,
   AllocationStatus,
-  Gender
+  Gender,
+  StudentStatus
 } from '../../types';
+import { z } from 'zod';
+import { Gender as GenderEnum } from '../../types';
+
+const admissionSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
+  dateOfBirth: z.string().min(1, 'Date of birth is required'),
+  gender: z.enum([GenderEnum.MALE, GenderEnum.FEMALE, GenderEnum.OTHER]),
+  street: z.string().min(5, 'Street address is required'),
+  city: z.string().min(2, 'City is required'),
+  state: z.string().min(2, 'State is required'),
+  zipCode: z.string().min(5, 'Zip code is required'),
+  country: z.string().min(2, 'Country is required'),
+  guardianName: z.string().min(2, 'Guardian name is required'),
+  guardianPhone: z.string().min(10, 'Guardian phone is required'),
+  guardianEmail: z.string().email('Invalid guardian email').optional().or(z.literal('')),
+  courseId: z.string().min(1, 'Course selection is required'),
+  previousEducation: z.string().min(10, 'Previous education details are required'),
+  percentage: z.number().min(0).max(100, 'Percentage must be between 0 and 100'),
+});
+
+type AdmissionFormData = z.infer<typeof admissionSchema>;
 
 // Mock data for demonstration
 const mockStats: DashboardStats = {
@@ -54,7 +78,7 @@ const mockFees: Fee[] = [
       course: { id: '1', name: 'Computer Science', code: 'CSE', duration: 4, fees: 100000, department: 'Engineering', isActive: true },
       year: 1,
       semester: 1,
-      status: 'active' as const,
+      status: StudentStatus.ACTIVE,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -85,7 +109,7 @@ const mockFees: Fee[] = [
       course: { id: '1', name: 'Computer Science', code: 'CSE', duration: 4, fees: 100000, department: 'Engineering', isActive: true },
       year: 1,
       semester: 1,
-      status: 'active' as const,
+      status: StudentStatus.ACTIVE,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -178,7 +202,7 @@ const mockAllocations: HostelAllocation[] = [
       course: { id: '1', name: 'Computer Science', code: 'CSE', duration: 4, fees: 100000, department: 'Engineering', isActive: true },
       year: 1,
       semester: 1,
-      status: 'active' as const,
+      status: StudentStatus.ACTIVE,
       createdAt: new Date(),
       updatedAt: new Date()
     },
@@ -194,7 +218,7 @@ const mockAllocations: HostelAllocation[] = [
 export default function DemoPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const handleAdmissionSubmit = async (data: any) => {
+  const handleAdmissionSubmit = async (data: AdmissionFormData) => {
     console.log('Admission data:', data);
     alert('Admission application submitted successfully!');
   };
@@ -236,7 +260,7 @@ export default function DemoPage() {
       </nav>
 
       {/* Tab Navigation */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b md:flex flex flex-col">
         <div className="max-w-7xl mx-auto px-6">
           <nav className="flex space-x-8">
             {tabs.map((tab) => (
